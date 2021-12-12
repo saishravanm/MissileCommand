@@ -1,5 +1,0 @@
-Content\SpriteFont1.xnb
-Content\SpriteFont2.xnb
-Content\Background.xnb
-Content\Destroyed City.xnb
-Content\Undestroyed City.xnb
