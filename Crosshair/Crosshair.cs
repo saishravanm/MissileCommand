@@ -9,9 +9,9 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 
-namespace MissileCommand
+namespace Missile_Command
 {
-    class Crosshair
+    public class Crosshair
     {
         public Rectangle rect;
         public Texture2D text;
@@ -46,7 +46,7 @@ namespace MissileCommand
             //}
             rect.X = x;
             rect.Y = y;
-            if(rect.X < 0)
+            if (rect.X < 0)
             {
                 rect.X = 0;
             }
@@ -54,7 +54,7 @@ namespace MissileCommand
             {
                 rect.Y = 0;
             }
-            if(rect.X + rect.Width > width)
+            if (rect.X + rect.Width > width)
             {
                 rect.X = width - rect.Width;
             }
