@@ -66,7 +66,7 @@ namespace Missile_Command
                 if (drect.Width <= 0) 
                     return true;
             } else {
-                if (y > 440) {
+                if (y > 420) {
                     startexploding();
                 }
 
@@ -104,8 +104,17 @@ namespace Missile_Command
             for (int i = 0; i < input.Length; i++)
             {
                 output[i] = intersects(input[i].rectangle);
-                
             }
+            return output;
+        }
+
+        public Boolean circleintersects(Rectangle input)
+        {
+            Boolean output = false;
+            int radius = drect.Width / 2;
+            double distance1 = Math.Sqrt(Math.Pow(input.X - x, 2) + Math.Pow(input.Y - y, 2));
+            double distance2 = Math.Sqrt(Math.Pow(input.X+input.Width - x, 2) + Math.Pow(input.Y+input.Height - y, 2));
+            if (output) { startexploding(); }
             return output;
         }
 
