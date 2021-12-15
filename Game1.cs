@@ -87,6 +87,7 @@ namespace Missile_Command
             undestroyedCity = Content.Load<Texture2D>("Undestroyed City");
             EnemyMissle.rocketpic = Content.Load<Texture2D>("misslepic");
             EnemyMissle.explosionpic = Content.Load<Texture2D>("redexplosion");
+            EnemyMissle.trailpic = Content.Load<Texture2D>("trail");
             PlayerMissile.rocketpic = Content.Load<Texture2D>("PlayerMissile");
             PlayerMissile.explosionpic = Content.Load<Texture2D>("yellowexplosion");
             rocket = Content.Load<Texture2D>("misslepic");
@@ -114,6 +115,7 @@ namespace Missile_Command
                 //}
                 num += 385;
             }
+            EnemyMissle.trailorigin = new Vector2(EnemyMissle.trailpic.Width, EnemyMissle.trailpic.Height / 2);
         }
 
         /// <summary>
@@ -304,6 +306,10 @@ namespace Missile_Command
                     //draw enemy missles
                     for (int i = 0; i < enemylist.Count; i++)
                     {
+                        if (enemylist[i].traildrect.Width>0)
+                        {
+                            spriteBatch.Draw(EnemyMissle.trailpic, enemylist[i].traildrect, null, Color.White, enemylist[i].angle, EnemyMissle.trailorigin, SpriteEffects.None, 0);
+                        }
                         spriteBatch.Draw(enemylist[i].pic, enemylist[i].drect, EnemyMissle.srect, Color.White, enemylist[i].angle, EnemyMissle.origin, SpriteEffects.None, 0);
                     }
 

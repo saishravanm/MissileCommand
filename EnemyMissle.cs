@@ -13,17 +13,19 @@ namespace Missile_Command
 {
     class EnemyMissle
     {
+        public static Texture2D rocketpic, explosionpic, trailpic;
         public double vx, vy; // missle velocity
+        public int speed;
         public double x, y; //missle position
         public float angle; //rotation in radians with respect to +x axis
-        public Rectangle drect; //source and destination rectangles;
+        public Rectangle drect, traildrect; //source and destination rectangles;
         public Texture2D pic;
         public Boolean exploded;
         int explosionspeed;
         public static Rectangle srect = new Rectangle(0, 0, 200, 200);
         public static Vector2 origin = new Vector2(srect.Width / 2, srect.Height / 2);
+        public static Vector2 trailorigin;
         static Random rn = new Random();
-        public static Texture2D rocketpic, explosionpic;
 
         public EnemyMissle(int xtarget, int ytarget, int screenwidth)
         {
@@ -48,11 +50,12 @@ namespace Missile_Command
             {
                 angle = (float)(Math.Atan(vy / vx));
             }
-
+            speed = 1 + (int)Math.Sqrt(vx * vx + vy * vy);
 
 
             //setup stuff for drawing
             drect = new Rectangle((int)x, (int)y, 20, 20);
+            traildrect = new Rectangle(drect.X, drect.Y, 100, 8);            
             pic = rocketpic;
         }
 
@@ -67,6 +70,7 @@ namespace Missile_Command
                 }
                 drect.Width += explosionspeed;
                 drect.Height = drect.Width;
+                traildrect.Width-=speed; //decrease trail size after explosion based on velocity
                 if (drect.Width <= 0)
                     return true;
             }
@@ -82,6 +86,8 @@ namespace Missile_Command
                 y += vy;
                 drect.X = (int)x;
                 drect.Y = (int)y;
+                traildrect.X = drect.X;
+                traildrect.Y = drect.Y;
             }
             return false;
         }
