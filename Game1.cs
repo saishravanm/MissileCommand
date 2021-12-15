@@ -35,7 +35,9 @@ namespace Missile_Command
         City[] cities;
         List<EnemyMissle> enemylist;
         int score;
-
+        int missileCount = 30;
+        MissileSite[] sites = new MissileSite[3];
+        Texture2D rocket, explos;
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -64,7 +66,7 @@ namespace Missile_Command
             cities[5] = new City(new Rectangle(675, 415, 45, 15), false);
             r = new Rectangle(150, 100, 40, 10);
             score = 0;
-            enemylist = new List<EnemyMissle>(10);
+            enemylist = new List<EnemyMissle>(15);
             base.Initialize();
         }
 
@@ -85,9 +87,33 @@ namespace Missile_Command
             undestroyedCity = Content.Load<Texture2D>("Undestroyed City");
             EnemyMissle.rocketpic = Content.Load<Texture2D>("misslepic");
             EnemyMissle.explosionpic = Content.Load<Texture2D>("redexplosion");
+            PlayerMissile.rocketpic = Content.Load<Texture2D>("PlayerMissile");
+            PlayerMissile.explosionpic = Content.Load<Texture2D>("yellowexplosion");
+            rocket = Content.Load<Texture2D>("misslepic");
+            explos = Content.Load<Texture2D>("redexplosion");
             t = new Texture2D(GraphicsDevice, 1, 1);
             t.SetData(new Color[] { Color.White });
             plane = new Crosshair(r, t);
+            int num = 10; //DANG IT RAHUL WTF ARE THESE VAIRABLE NAMES
+            int numY = 402;
+            for (int i = 0; i < 3; i++)
+            {
+                if (i == 1)
+                {
+                    numY = 405;
+                }
+                else
+                {
+                    numY = 402;
+                }
+                List<PlayerMissile> list = new List<PlayerMissile>();
+                sites[i] = new MissileSite(new Rectangle(num, numY, 10, 10), t);
+                //for (int j = 0; j < 10; j++)
+                //{
+                //    sites[i].addMissile(new PlayerMissile(0,0,GraphicsDevice.Viewport.Width, new Rectangle(sites[i].rect.X + sites[i].rect.Width / 2 - 20, sites[i].rect.Y - 20, 20, 20), rocket, explos));
+                //}
+                num += 385;
+            }
         }
 
         /// <summary>
@@ -98,7 +124,7 @@ namespace Missile_Command
         {
             // TODO: Unload any non ContentManager content here
         }
-
+        
         /// <summary>
         /// Allows the game to run logic such as updating the world,
         /// checking for collisions, gathering input, and playing audio.
@@ -114,12 +140,23 @@ namespace Missile_Command
                 this.Exit();
 
             // changed to case switch statement to make eeasier to read
-            switch (gameState) {
+            switch (gameState)
+            {
                 case GameState.StartScreen:
-                    if (kb.IsKeyDown(Keys.Space)) {
-                        for (int i = 0; i < 10; i++)
+                    if (kb.IsKeyDown(Keys.Space))
+                    {
+
+                        //spawn enemy missles headed towards cities
+                        for (int i = 0; i < cities.Length; i++)
                         {
-                            enemylist.Add(new EnemyMissle(70*i+100, w-50, w));
+                            enemylist.Add(new EnemyMissle(cities[i].rectangle.X + cities[i].rectangle.Width / 2, cities[i].rectangle.Y, w));
+                            enemylist.Add(new EnemyMissle(cities[i].rectangle.X + cities[i].rectangle.Width / 2, cities[i].rectangle.Y, w));
+                        }
+
+                        //spawn enemy missles headed towards missile sites
+                        for (int i = 0; i < sites.Length; i++) {
+                            enemylist.Add(new EnemyMissle(sites[i].rect.X + sites[i].rect.Width/2, sites[i].rect.Y, w));
+
                         }
 
                         //advance gamestate
@@ -128,27 +165,88 @@ namespace Missile_Command
 
                     break;
                 case GameState.GameplayScreen:
+                    //plane.update(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height, newMouse.X, newMouse.Y);
+                    MissileSite s = closestSite(newMouse.X, newMouse.Y);
                     plane.update(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height, newMouse.X, newMouse.Y);
+                    if (newMouse.LeftButton == ButtonState.Pressed && oldMouse.LeftButton == ButtonState.Released && s != null && s.missileIndex < 10)
+                    {
+                        if (s.missileIndex < 10)
+                        {
+                            s.addMissile(new PlayerMissile(plane.rect.X + plane.rect.Width / 2, plane.rect.Y + plane.rect.Height / 2, GraphicsDevice.Viewport.Width, new Rectangle(s.rect.X + s.rect.Width / 2, s.rect.Y - 10, 20, 20)));
+                            s.missileIndex++;
+                            s.activated = true;
+                        }
+                        else //if(s.missileIndex == 10)
+                        {
+                            s.drained = true;
+                        }
+                    }
+                    for (int i = 0; i < sites.Length; i++)
+                    {
+                        if (sites[i].activated)
+                        {
+                            //sites[i].getMissile(sites[i].missileIndex - 1).xT = plane.rect.X;
+                            //sites[i].getMissile(sites[i].missileIndex - 1).yT = plane.rect.Y;
+                            missileCount--;
+                            sites[i].activated = false;
+                        }
+
+                        //player missile update method is here named firemissile for some reason
+                        sites[i].fireMissile();
+
+                        //check for exploded player missiles, kinda convulted because missile list is within a seperate class
+                        for (int j = 0; j < sites[i].missiles.Count; j++) {
+                            if (sites[i].missiles[j].exploded) {
+                                //check with enemy missiles
+                                for (int k = 0; k < enemylist.Count; k++)
+                                {
+                                    if (sites[i].missiles[j].circleintersects(enemylist[k]))
+                                    {
+                                        enemylist[k].startexploding();
+                                    }
+                                }
+
+                                //check with airplanes
+                               
+                            }
+                        }
+                    }
+                    oldMouse = newMouse;
 
                     //update enemymissiles
-                    for (int i = 0; i < enemylist.Count; i++) {
-
-                        Boolean removethis=enemylist[i].update();
+                    for (int i = 0; i < enemylist.Count; i++)
+                    {
                         //delete missle when explosion size==0, which is returned by update method
-                        if (removethis)
+                        if (enemylist[i].update())
                         {
                             enemylist.RemoveAt(i);
                         }
-                        else {
+                        else
+                        {
+                            //check collision with cities
                             Boolean[] deadcities = enemylist[i].intersects(cities);
                             //change city to be destroyed
-                            for (int j = 0; j < cities.Length; j++) {
-                                if (deadcities[j]) {
+                            for (int j = 0; j < cities.Length; j++)
+                            {
+                                if (deadcities[j])
+                                {
                                     cities[j].isDestroyed = true;
+                                }
+                            }
+
+                            //check collision with exploded missiles
+                            if (enemylist[i].exploded)
+                            {
+                                for (int j = 0; j < enemylist.Count; j++)
+                                {
+                                    if (enemylist[i].circleintersects(enemylist[j].drect)) {
+                                        enemylist[j].startexploding();
+                                    }
                                 }
                             }
                         }
                     }
+
 
 
                     break;
@@ -168,7 +266,8 @@ namespace Missile_Command
 
             // TODO: Add your drawing code here
             spriteBatch.Begin();
-            switch (gameState) {
+            switch (gameState)
+            {
                 case GameState.StartScreen:
                     spriteBatch.DrawString(font1, "Welcome to", new Vector2(200, 60), Color.Red);
                     spriteBatch.DrawString(font1, "Missile Command!", new Vector2(90, 140), Color.Red);
@@ -179,7 +278,16 @@ namespace Missile_Command
                     break;
                 case GameState.GameplayScreen:
                     spriteBatch.Draw(background, new Rectangle(0, 0, 800, 480), Color.White);
-
+                    spriteBatch.DrawString(font2, "Missile Count: " + missileCount + "", new Vector2(0, 0), Color.Red);
+                    //missile sites and player missiles
+                    for (int i = 0; i < sites.Length; i++)
+                    {
+                        sites[i].Draw(spriteBatch, gameTime);
+                        for (int j = 0; j < sites[i].missiles.Count; j++)
+                        {
+                            sites[i].getMissile(j).Draw(spriteBatch, gameTime);
+                        }
+                    }
                     //city stuff
                     for (int i = 0; i < 6; i++)
                     {
@@ -206,6 +314,49 @@ namespace Missile_Command
 
             spriteBatch.End();
             base.Draw(gameTime);
+        }
+
+
+
+
+        MissileSite closestSite(int x, int y)
+        {
+            int num = 0;
+            for (int i = 0; i < 3; i++)
+            {
+                if (!sites[i].drained)
+                {
+                    num++;
+                }
+            }
+            for (int i = 0; i < sites.Length; i++)
+            {
+                if (!sites[i].drained)
+                {
+                    sites[i].distanceFromM = Math.Sqrt(Math.Pow(x - (sites[i].rect.X), 2) + Math.Pow(y - (sites[i].rect.Y), 2));
+                }
+            }
+            int indexOfL = -1;
+            for (int i = 0; i < sites.Length; i++)
+            {
+                if (!sites[i].drained)
+                {
+                    indexOfL = i;
+                    break;
+                }
+            }
+            if (indexOfL != -1)
+            {
+                for (int i = indexOfL; i < sites.Length; i++)
+                {
+                    if (!sites[i].drained && sites[i].distanceFromM < sites[indexOfL].distanceFromM)
+                    {
+                        indexOfL = i;
+                    }
+                }
+                return sites[indexOfL];
+            }
+            return null;
         }
     }
 }

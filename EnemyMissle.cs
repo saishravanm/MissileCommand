@@ -22,7 +22,7 @@ namespace Missile_Command
         int explosionspeed;
         public static Rectangle srect = new Rectangle(0, 0, 200, 200);
         public static Vector2 origin = new Vector2(srect.Width / 2, srect.Height / 2);
-        static Random rn=new Random();
+        static Random rn = new Random();
         public static Texture2D rocketpic, explosionpic;
 
         public EnemyMissle(int xtarget, int ytarget, int screenwidth)
@@ -42,31 +42,38 @@ namespace Missile_Command
             //calculate angle based on velocity
             if (vx <= 0)
             {
-                angle = (float)(Math.Atan(vy / vx)+Math.PI);
+                angle = (float)(Math.Atan(vy / vx) + Math.PI);
             }
-            else {
+            else
+            {
                 angle = (float)(Math.Atan(vy / vx));
             }
 
-            
-            
+
+
             //setup stuff for drawing
             drect = new Rectangle((int)x, (int)y, 20, 20);
             pic = rocketpic;
         }
 
         //update method returns whether the main method should delete the object
-        public Boolean update() {
-            if (exploded) {
-                if (drect.Width > 50 && explosionspeed>0) {
+        public Boolean update()
+        {
+            if (exploded)
+            {
+                if (drect.Width > 50 && explosionspeed > 0)
+                {
                     explosionspeed *= -1;
                 }
                 drect.Width += explosionspeed;
                 drect.Height = drect.Width;
-                if (drect.Width <= 0) 
+                if (drect.Width <= 0)
                     return true;
-            } else {
-                if (y > 420) {
+            }
+            else
+            {
+                if (y > 420)
+                {
                     startexploding();
                 }
 
@@ -80,7 +87,8 @@ namespace Missile_Command
         }
 
         //check if object intersects a rectangle
-        public Boolean intersects(Rectangle input) {
+        public Boolean intersects(Rectangle input)
+        {
             Boolean output = false;
             int radius = drect.Width / 2;
             //double distance = Math.Sqrt(Math.Pow(input.X - origin.X, 2) + Math.Pow(input.Y - origin.Y, 2));
@@ -92,7 +100,8 @@ namespace Missile_Command
         public Boolean[] intersects(Rectangle[] input)
         {
             Boolean[] output = new Boolean[input.Length];
-            for (int i = 0; i < input.Length; i++) {
+            for (int i = 0; i < input.Length; i++)
+            {
                 output[i] = intersects(input[i]);
             }
             return output;
@@ -113,12 +122,14 @@ namespace Missile_Command
             Boolean output = false;
             int radius = drect.Width / 2;
             double distance1 = Math.Sqrt(Math.Pow(input.X - x, 2) + Math.Pow(input.Y - y, 2));
-            double distance2 = Math.Sqrt(Math.Pow(input.X+input.Width - x, 2) + Math.Pow(input.Y+input.Height - y, 2));
+            double distance2 = Math.Sqrt(Math.Pow(input.X + input.Width - x, 2) + Math.Pow(input.Y + input.Height - y, 2));
+            output = distance1 <= radius || distance2 <= radius;
             if (output) { startexploding(); }
             return output;
         }
 
-        public void startexploding() {
+        public void startexploding()
+        {
             if (!exploded)
             {
                 pic = explosionpic;
