@@ -35,7 +35,10 @@ namespace Missile_Command
         City[] cities;
         List<EnemyMissle> enemylist;
         int score;
+<<<<<<< Updated upstream
         int missileCount = 30;
+=======
+>>>>>>> Stashed changes
         MissileSite[] sites = new MissileSite[3];
         Texture2D rocket, explos;
         public Game1()
@@ -95,7 +98,11 @@ namespace Missile_Command
             t = new Texture2D(GraphicsDevice, 1, 1);
             t.SetData(new Color[] { Color.White });
             plane = new Crosshair(r, t);
+<<<<<<< Updated upstream
             int num = 10; //DANG IT RAHUL WTF ARE THESE VAIRABLE NAMES
+=======
+            int num = 10;
+>>>>>>> Stashed changes
             int numY = 402;
             for (int i = 0; i < 3; i++)
             {
@@ -115,7 +122,10 @@ namespace Missile_Command
                 //}
                 num += 385;
             }
+<<<<<<< Updated upstream
             EnemyMissle.trailorigin = new Vector2(EnemyMissle.trailpic.Width, EnemyMissle.trailpic.Height / 2);
+=======
+>>>>>>> Stashed changes
         }
 
         /// <summary>
@@ -126,7 +136,27 @@ namespace Missile_Command
         {
             // TODO: Unload any non ContentManager content here
         }
+<<<<<<< Updated upstream
         
+=======
+        MissileSite closestSite(int x, int y)
+        {
+            double[] distances = new double[3];
+            for (int i = 0; i < sites.Length; i++)
+            {
+                sites[i].distanceFromM = Math.Sqrt(Math.Pow(x - (sites[i].rect.X), 2) + Math.Pow(y - (sites[i].rect.Y), 2));
+            }
+            int indexOfL = 0;
+            for (int i = 1; i < sites.Length; i++)
+            {
+                if (sites[i].distanceFromM < sites[indexOfL].distanceFromM)
+                {
+                    indexOfL = i;
+                }
+            }
+            return sites[indexOfL];
+        }
+>>>>>>> Stashed changes
         /// <summary>
         /// Allows the game to run logic such as updating the world,
         /// checking for collisions, gathering input, and playing audio.
@@ -170,6 +200,7 @@ namespace Missile_Command
                     //plane.update(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height, newMouse.X, newMouse.Y);
                     MissileSite s = closestSite(newMouse.X, newMouse.Y);
                     plane.update(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height, newMouse.X, newMouse.Y);
+<<<<<<< Updated upstream
                     if (newMouse.LeftButton == ButtonState.Pressed && oldMouse.LeftButton == ButtonState.Released && s != null && s.missileIndex < 10)
                     {
                         if (s.missileIndex < 10)
@@ -181,6 +212,15 @@ namespace Missile_Command
                         else //if(s.missileIndex == 10)
                         {
                             s.drained = true;
+=======
+                    if (newMouse.LeftButton == ButtonState.Pressed && oldMouse.LeftButton == ButtonState.Released && closestSite(newMouse.X, newMouse.Y).missileIndex < 10)
+                    {
+                        s.missileIndex++;
+                        s.activated = true;
+                        if (s.missileIndex < 10)
+                        {
+                            s.addMissile(new PlayerMissile(plane.rect.X + plane.rect.Width / 2, plane.rect.Y + plane.rect.Height / 2, GraphicsDevice.Viewport.Width, new Rectangle(s.rect.X + s.rect.Width / 2 - 20, s.rect.Y - 20, 20, 20), rocket, explos));
+>>>>>>> Stashed changes
                         }
                     }
                     for (int i = 0; i < sites.Length; i++)
@@ -192,9 +232,17 @@ namespace Missile_Command
                             missileCount--;
                             sites[i].activated = false;
                         }
+<<<<<<< Updated upstream
 
                         //player missile update method is here named firemissile for some reason
                         sites[i].fireMissile();
+=======
+                        sites[i].fireMissile();
+                    }
+                    oldMouse = newMouse;
+                    //update enemymissiles
+                    for (int i = 0; i < enemylist.Count; i++) {
+>>>>>>> Stashed changes
 
                         //check for exploded player missiles, kinda convulted because missile list is within a seperate class
                         for (int j = 0; j < sites[i].missiles.Count; j++) {
@@ -280,8 +328,11 @@ namespace Missile_Command
                     break;
                 case GameState.GameplayScreen:
                     spriteBatch.Draw(background, new Rectangle(0, 0, 800, 480), Color.White);
+<<<<<<< Updated upstream
                     spriteBatch.DrawString(font2, "Missile Count: " + missileCount + "", new Vector2(0, 0), Color.Red);
                     //missile sites and player missiles
+=======
+>>>>>>> Stashed changes
                     for (int i = 0; i < sites.Length; i++)
                     {
                         sites[i].Draw(spriteBatch, gameTime);
